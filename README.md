@@ -45,6 +45,12 @@ from these. The fourth statement relies on operator precedence;
 multiplication precedes addition. Finally, the cycle persists $(p', i')$
 for the next monotonic cycle.
 
+The PID derivative term deserves some comment. The output does not
+divide by time despite its delta time denominator. The denominator
+factors in the integral factor. Divide the factor by delta time. This
+obviates a divide operation, an expensive machine operation in cycle
+times. The integral factor pre-divides by $dt$.
+
 ## Full Class
 
 The full `pid::controller` class listing appears below.
@@ -133,7 +139,8 @@ diagnostics.
 
 # C++ with R Wrapper
 
-Import the wrapper class for R as follows.
+Import the wrapper class for R as follows. R has a canny ability to
+dynamically compile and run chunks of C++. It works well.
 
 ``` cpp
 #include <Rcpp.h>
@@ -177,7 +184,7 @@ PIDController
 ```
 
 ``` bg-warning
-C++ class 'PIDController' <00000256953f85c0>
+C++ class 'PIDController' <0000024fd12fd0c0>
 Constructors:
     PIDController(double, double, double)
 

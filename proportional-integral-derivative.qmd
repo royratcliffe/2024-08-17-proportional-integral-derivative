@@ -73,6 +73,8 @@ The implementation uses trailing underscore to mark PID class members. This help
 
 The `const` declarations are computationally redundant but semantically useful. The initial statements load the core's register set with the new monotonic cycle's $(p, i, d)$ triplet. The latest output value derives from these. The fourth statement relies on operator precedence; multiplication precedes addition. Finally, the cycle persists $(p', i')$ for the next monotonic cycle.
 
+The PID derivative term deserves some comment. The output does not divide by time despite its delta time denominator. The denominator factors in the integral factor. Divide the factor by delta time. This obviates a divide operation, an expensive machine operation in cycle times. The integral factor pre-divides by $dt$.
+
 ## Full Class
 
 The full `pid::controller` class listing appears below.
@@ -86,7 +88,7 @@ The full implementation additionally persists the *derivative* term in volatile 
 
 # C++ with R Wrapper
 
-Import the wrapper class for R as follows.
+Import the wrapper class for R as follows. R has a canny ability to dynamically compile and run chunks of C++. It works well.
 
 ```{.cpp include="pid_controller.cpp" code-line-numbers="true"}
 ```
