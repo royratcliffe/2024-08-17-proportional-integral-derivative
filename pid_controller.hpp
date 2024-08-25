@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef __cplusplus
 namespace pid {
 template <typename T, typename U = T> class controller {
 public:
@@ -62,3 +63,20 @@ private:
   scalar_type control_, measure_, out_;
 };
 } // namespace pid
+#endif
+
+struct pid_float_s {
+  float kp_, ki_, kd_;
+  float p_, i_, d_;
+  float control_, measure_, out_;
+};
+
+static inline void pid_float_monotonic(struct pid_float_s *pid_float) {
+  const float p = pid_float->control_ - pid_float->measure_;
+  const float i = pid_float->i_ + p;
+  const float d = p - pid_float->p_;
+  pid_float->out_ = pid_float->kp_ * p + pid_float->ki_ * i + pid_float->kd_ * d;
+  pid_float->p_ = p;
+  pid_float->i_ = i;
+  pid_float->d_ = d;
+}
