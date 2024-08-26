@@ -56,8 +56,34 @@ times. The integral factor pre-divides by $dt$.
 The full `pid::controller` class listing appears below.
 
 ``` cpp
+/*!
+ * \file pid_controller.hpp
+ * \copyright (c) 2024, Roy Ratcliffe, Northumberland, United Kingdom
+ * SPDX-License-Identifier: MIT
+ *
+ * Permission is hereby granted, free of charge,  to any person obtaining a
+ * copy  of  this  software  and    associated   documentation  files  (the
+ * "Software"), to deal in  the   Software  without  restriction, including
+ * without limitation the rights to  use,   copy,  modify,  merge, publish,
+ * distribute, sublicense, and/or sell  copies  of   the  Software,  and to
+ * permit persons to whom the Software is   furnished  to do so, subject to
+ * the following conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT  WARRANTY OF ANY KIND, EXPRESS
+ * OR  IMPLIED,  INCLUDING  BUT  NOT   LIMITED    TO   THE   WARRANTIES  OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR   PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS  OR   COPYRIGHT  HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY,  WHETHER   IN  AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM,  OUT  OF   OR  IN  CONNECTION  WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 #pragma once
 
+#ifdef __cplusplus
 namespace pid {
 template <typename T, typename U = T> class controller {
 public:
@@ -120,6 +146,30 @@ private:
   scalar_type control_, measure_, out_;
 };
 } // namespace pid
+#endif
+
+struct pid_float_s {
+  float kp_, ki_, kd_;
+  float p_, i_, d_;
+  float control_, measure_, out_;
+};
+
+/*!
+ * \brief Applies Proportion, Integral and Derivative monotonically.
+ * \details First, set up the control point. Feed in the measurement samples
+ * while applying the monotonic method until the output matches the control. The
+ * name implies that the control hardware runs it periodically at a real-time
+ * fixed rate---neither faster nor slower. The application is real-time.
+ */
+static inline void pid_float_monotonic(struct pid_float_s *pid_float) {
+  const float p = pid_float->control_ - pid_float->measure_;
+  const float i = pid_float->i_ + p;
+  const float d = p - pid_float->p_;
+  pid_float->out_ = pid_float->kp_ * p + pid_float->ki_ * i + pid_float->kd_ * d;
+  pid_float->p_ = p;
+  pid_float->i_ = i;
+  pid_float->d_ = d;
+}
 ```
 
 The C++ code defines two types: one for the scalars and another for the
@@ -147,7 +197,7 @@ dynamically compile and run chunks of C++. It works well.
 
 using namespace Rcpp;
 
-#include "pid_controller.hpp"
+#include "pid_controller.h"
 
 typedef pid::controller<double> PIDController;
 
@@ -163,7 +213,6 @@ RCPP_MODULE(mod_pid) {
     .property("integral", &PIDController::integral)
     .property("derivative", &PIDController::derivative);
 }
-
 ```
 
 Sourcing the C++ compiles the code, building and loading a library. The
@@ -184,7 +233,7 @@ PIDController
 ```
 
 ``` bg-warning
-C++ class 'PIDController' <0000024fd12fd0c0>
+C++ class 'PIDController' <00000269b17e99e0>
 Constructors:
     PIDController(double, double, double)
 
