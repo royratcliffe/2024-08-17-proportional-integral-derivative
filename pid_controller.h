@@ -1,6 +1,7 @@
 /*!
  * \file pid_controller.hpp
  * \copyright (c) 2024, Roy Ratcliffe, Northumberland, United Kingdom
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge,  to any person obtaining a
  * copy  of  this  software  and    associated   documentation  files  (the
@@ -95,6 +96,13 @@ struct pid_float_s {
   float control_, measure_, out_;
 };
 
+/*!
+ * \brief Applies Proportion, Integral and Derivative monotonically.
+ * \details First, set up the control point. Feed in the measurement samples
+ * while applying the monotonic method until the output matches the control. The
+ * name implies that the control hardware runs it periodically at a real-time
+ * fixed rate---neither faster nor slower. The application is real-time.
+ */
 static inline void pid_float_monotonic(struct pid_float_s *pid_float) {
   const float p = pid_float->control_ - pid_float->measure_;
   const float i = pid_float->i_ + p;
