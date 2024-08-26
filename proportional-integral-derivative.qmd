@@ -79,7 +79,7 @@ The PID derivative term deserves some comment. The output does not divide by tim
 
 The full `pid::controller` class listing appears below.
 
-```{.cpp include="pid_controller.hpp" code-line-numbers="true"}
+```{.cpp include="pid_controller.h" code-line-numbers="true"}
 ```
 
 The C++ code defines two types: one for the scalars and another for the factors. This allows for higher precision when computing the output. For example, assuming that the platform supports both 32- and 64-bit floating-point numbers, the application may choose to apply double precision for the computation, but cast to single-precision floats for the persistent scalar terms. Many embedded platforms will support only 32-bit single-precision floating-point arithmetic. The C++ implementation therefore defaults to factor precision matching scalar precision.

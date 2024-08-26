@@ -2,7 +2,7 @@
 
 using namespace Rcpp;
 
-#include "pid_controller.hpp"
+#include "pid_controller.h"
 
 typedef pid::controller<double> PIDController;
 
@@ -18,4 +18,3 @@ RCPP_MODULE(mod_pid) {
     .property("integral", &PIDController::integral)
     .property("derivative", &PIDController::derivative);
 }
-
