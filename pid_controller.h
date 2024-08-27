@@ -1,5 +1,5 @@
 /*!
- * \file pid_controller.hpp
+ * \file pid_controller.h
  * \copyright (c) 2024, Roy Ratcliffe, Northumberland, United Kingdom
  * SPDX-License-Identifier: MIT
  *
