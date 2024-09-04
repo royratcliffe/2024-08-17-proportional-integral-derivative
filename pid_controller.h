@@ -90,9 +90,16 @@ private:
 } // namespace pid
 #endif
 
-struct pid_float_s {
-  float kp_, ki_, kd_;
+/*!
+ * \brief Abstracted proportion-integral-derivative triple.
+ */
+struct pid_float {
   float p_, i_, d_;
+};
+
+struct pid_float_controller {
+  const struct pid_float *k_;
+  struct pid_float accumulator_;
   float control_, measure_, out_;
 };
 
@@ -103,12 +110,12 @@ struct pid_float_s {
  * name implies that the control hardware runs it periodically at a real-time
  * fixed rate---neither faster nor slower. The application is real-time.
  */
-static inline void pid_float_monotonic(struct pid_float_s *pid_float) {
-  const float p = pid_float->control_ - pid_float->measure_;
-  const float i = pid_float->i_ + p;
-  const float d = p - pid_float->p_;
-  pid_float->out_ = pid_float->kp_ * p + pid_float->ki_ * i + pid_float->kd_ * d;
-  pid_float->p_ = p;
-  pid_float->i_ = i;
-  pid_float->d_ = d;
+static inline void pid_float_controller_monotonic(struct pid_float_controller *pid_float_controller) {
+  const float p = pid_float_controller->control_ - pid_float_controller->measure_;
+  const float i = pid_float_controller->accumulator_.i_ + p;
+  const float d = p - pid_float_controller->accumulator_.p_;
+  pid_float_controller->out_ = pid_float_controller->k_->p_ * p + pid_float_controller->k_->i_ * i + pid_float_controller->k_->d_ * d;
+  pid_float_controller->accumulator_.p_ = p;
+  pid_float_controller->accumulator_.i_ = i;
+  pid_float_controller->accumulator_.d_ = d;
 }
